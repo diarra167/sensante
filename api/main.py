@@ -3,6 +3,7 @@
 # Lab 3 - Integration de Modeles IA - ESP / UCAD
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 import joblib
 import numpy as np
@@ -33,6 +34,16 @@ app = FastAPI(
     version="0.2.0"
 )
 
+# --- Étape 6.1 : Configuration CORS ---
+# Autoriser les requêtes depuis le frontend (indispensable en développement)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 # --- Chargement du modele (une seule fois) ---
 
 print("Chargement du modele...")
@@ -47,6 +58,19 @@ print(f"Modele charge : {list(model.classes_)}")
 @app.get("/health")
 def health_check():
     return {"status": "ok", "message": "SenSante API is running"}
+
+# EXERCICE 1 : Route d'informations sur le modèle
+@app.get("/model-info")
+def get_model_info():
+    """
+    Renvoie les details techniques du modele RandomForest utilise.
+    """
+    return {
+        "model_type": type(model).__name__,
+        "n_estimators": getattr(model, "n_estimators", "N/A"),
+        "classes": list(model.classes_),
+        "n_features": model.n_features_in_
+    }
 
 @app.post("/predict", response_model=DiagnosticOutput)
 def predict(patient: PatientInput):
