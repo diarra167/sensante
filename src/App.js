@@ -1,15 +1,21 @@
 import { useState } from 'react';
 import './App.css';
 import Header from './Header';
+import Footer from './Footer';
 import Recherche from './Recherche';
 import LigneBus from './LigneBus';
 import DetailLigne from './DetailLigne';
-import Footer from './Footer';
+
 
 function App() {
+  // --- ÉTATS (STATES) ---
   const [recherche, setRecherche] = useState("");
   const [ligneSelectionnee, setLigneSelectionnee] = useState(null);
+  
+  // Exercice 3 : État pour compter le nombre de recherches effectuées
+  const [compteurRecherche, setCompteurRecherche] = useState(0);
 
+  // --- DONNÉES ---
   const lignes = [
     { id: 1, numero: "1", depart: "Parcelles Assainies", arrivee: "Plateau", arrets: 14, listeArrets: ["Parcelles U14", "Parcelles U10", "Camberene", "Patte d'Oie", "Grand Dakar", "Colobane", "Ponty", "Plateau"] },
     { id: 2, numero: "7", depart: "Guediawaye", arrivee: "Place Obe", arrets: 18, listeArrets: ["Guediawaye", "Pikine", "Thiaroye", "Keur Massar", "Grand Yoff", "Parcelles", "Liberte 6", "Place Obe"] },
@@ -19,12 +25,22 @@ function App() {
     { id: 6, numero: "12", depart: "Yoff", arrivee: "Sandaga", arrets: 11, listeArrets: ["Yoff Village", "Aeroport LSS", "Parcelles U17", "Grand Yoff", "HLM", "Sandaga"] },
   ];
 
+  // --- LOGIQUE ---
+
+  // Exercice 3 : Fonction qui gère la saisie et incrémente le compteur
+  const handleRechercheChange = (nouvelleValeur) => {
+    setRecherche(nouvelleValeur);
+    setCompteurRecherche(compteurRecherche + 1);
+  };
+
+  // Filtrage des lignes
   const lignesFiltrees = lignes.filter(l =>
     l.depart.toLowerCase().includes(recherche.toLowerCase()) ||
     l.arrivee.toLowerCase().includes(recherche.toLowerCase()) ||
     l.numero.includes(recherche)
   );
 
+  // Gestion du clic sur une ligne
   function handleClickLigne(ligne) {
     if (ligneSelectionnee && ligneSelectionnee.id === ligne.id) {
       setLigneSelectionnee(null);
@@ -33,29 +49,45 @@ function App() {
     }
   }
 
+  // --- RENDU ---
   return (
     <div className="App">
       <Header />
       
       <main className="container">
-        <Recherche valeur={recherche} onChange={setRecherche} />
-
-        <p className="results-count">
-          {lignesFiltrees.length} ligne{lignesFiltrees.length > 1 ? 's' : ''} trouvée{lignesFiltrees.length > 1 ? 's' : ''}
-        </p>
-
-        <div className="lignes-grid">
-          {lignesFiltrees.map(ligne => (
-            <div key={ligne.id} onClick={() => handleClickLigne(ligne)}>
-              <LigneBus 
-                ligne={ligne} 
-                estSelectionnee={ligneSelectionnee?.id === ligne.id} 
-              />
-            </div>
-          ))}
+        
+        {/* Exercice 3 : Affichage du compteur de recherches */}
+        <div className="stats-recherche">
+          <p>Vous avez effectué <strong>{compteurRecherche}</strong> recherche(s).</p>
         </div>
 
-        {/* Affichage du détail si une ligne est sélectionnée */}
+        <Recherche valeur={recherche} onChange={handleRechercheChange} />
+
+        {/* Exercice 2 : Condition "Aucune ligne trouvée" */}
+        {lignesFiltrees.length === 0 ? (
+          <div className="message-vide">
+            <p>Aucune ligne trouvée pour : <strong>"{recherche}"</strong></p>
+          </div>
+        ) : (
+          <>
+            <p className="results-count">
+              {lignesFiltrees.length} ligne{lignesFiltrees.length > 1 ? 's' : ''} trouvée{lignesFiltrees.length > 1 ? 's' : ''}
+            </p>
+
+            <div className="lignes-grid">
+              {lignesFiltrees.map(ligne => (
+                <div key={ligne.id} onClick={() => handleClickLigne(ligne)}>
+                  <LigneBus 
+                    ligne={ligne} 
+                    estSelectionnee={ligneSelectionnee?.id === ligne.id} 
+                  />
+                </div>
+              ))}
+            </div>
+          </>
+        )}
+
+        {/* Détails de la ligne sélectionnée */}
         {ligneSelectionnee && (
           <DetailLigne ligne={ligneSelectionnee} />
         )}

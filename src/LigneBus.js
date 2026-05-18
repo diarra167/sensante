@@ -1,35 +1,18 @@
 import './LigneBus.css';
 
-function LigneBus({ ligne, estSelectionnee }) {
-  // On extrait les propriétés de l'objet ligne pour plus de clarté
-  const { numero, depart, arrivee, arrets, listeArrets } = ligne;
-
+function LigneBus({ numero, depart, arrivee, arrets, estSelectionnee, onClick }) {
   return (
-    <div className={`ligne-bus ${estSelectionnee ? 'selectionnee' : ''}`}>
-      <div className="ligne-header">
-        <span className="numero-badge">{numero}</span>
-        <div className="trajet">
-          <strong>{depart}</strong> 
-          <span className="fleche"> → </span> 
-          <strong>{arrivee}</strong>
-        </div>
+    <div
+      className={`ligne-bus ${estSelectionnee ? 'ligne-bus-active' : ''}`}
+      onClick={onClick}
+    >
+      <div className="ligne-numero">{numero}</div>
+      <div className="ligne-info">
+        <span className="ligne-trajet">
+          {depart} &rarr; {arrivee}
+        </span>
+        <span className="ligne-arrets">{arrets} arrets</span>
       </div>
-
-      <div className="infos-secondaires">
-        <p>{arrets} arrêts au total</p>
-      </div>
-
-      {/* Affichage conditionnel de la liste des arrêts si la ligne est sélectionnée */}
-      {estSelectionnee && (
-        <div className="liste-arrets-details">
-          <h4>Détail des arrêts :</h4>
-          <ul>
-            {listeArrets.map((arret, index) => (
-              <li key={index}>{arret}</li>
-            ))}
-          </ul>
-        </div>
-      )}
     </div>
   );
 }
