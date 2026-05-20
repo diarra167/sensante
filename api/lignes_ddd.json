@@ -6,6 +6,7 @@
     "arrivee": "Plateau",
     "arrets": 14,
     "listeArrets": [
+      "Arret Test Exo 3",
       "Parcelles U14",
       "Parcelles U10",
       "Camberene",
@@ -91,6 +92,30 @@
       "Grand Yoff",
       "HLM",
       "Sandaga"
+    ]
+  },
+  {
+    "id": 10,
+    "numero": "403",
+    "depart": "Guediawaye",
+    "arrivee": "Plateau",
+    "arrets": 28,
+    "listeArrets": [
+      "Guediawaye",
+      "Poste Thiaroye",
+      "Plateau"
+    ]
+  },
+  {
+    "id": 11,
+    "numero": "12",
+    "depart": "Pikine",
+    "arrivee": "Palais",
+    "arrets": 15,
+    "listeArrets": [
+      "Pikine",
+      "Castors",
+      "Palais"
     ]
   }
 ]

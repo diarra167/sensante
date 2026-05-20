@@ -5,6 +5,7 @@ import Footer from './Footer';
 import Recherche from './Recherche';
 import LigneBus from './LigneBus';
 import DetailLigne from './DetailLigne';
+import Carte from './Cartes'; // [cite: 288]
 
 function App() {
   const [lignes, setLignes] = useState([]);
@@ -13,12 +14,12 @@ function App() {
   const [recherche, setRecherche] = useState("");
   const [ligneSelectionnee, setLigneSelectionnee] = useState(null);
 
-  useEffect(() => {
+  const chargerDonnees = () => {
+    setChargement(true);
+    setErreur(null);
     fetch('http://localhost:5000/api/lignes')
       .then(response => {
-        if (!response.ok) {
-          throw new Error("Erreur serveur : " + response.status);
-        }
+        if (!response.ok) throw new Error("Erreur serveur : " + response.status);
         return response.json();
       })
       .then(data => {
@@ -29,6 +30,10 @@ function App() {
         setErreur(error.message);
         setChargement(false);
       });
+  };
+
+  useEffect(() => {
+    chargerDonnees();
   }, []);
 
   const lignesFiltrees = lignes.filter(l =>
@@ -41,49 +46,31 @@ function App() {
     if (ligneSelectionnee && ligneSelectionnee.id === ligne.id) {
       setLigneSelectionnee(null);
     } else {
-      setLigneSelectionnee(ligne);
+      fetch(`http://localhost:5000/api/lignes/${ligne.id}`)
+        .then(response => {
+          if (!response.ok) throw new Error("Détails non trouvés");
+          return response.json();
+        })
+        .then(data => setLigneSelectionnee(data))
+        .catch(err => {
+          console.error("Erreur chargement détails:", err);
+          setLigneSelectionnee(ligne);
+        });
     }
   }
 
-  if (chargement) {
-    return (
-      <div className="App">
-        <Header />
-        <main className="contenu">
-          <p className="message-chargement">Chargement des lignes ...</p>
-        </main>
-      </div>
-    );
-  }
+  if (chargement) return <div className="App"><Header /><main className="contenu"><p>Chargement...</p></main></div>;
 
-  if (erreur) {
-    return (
-      <div className="App">
-        <Header />
-        <main className="contenu">
-          <div className="message-erreur">
-            <p>Impossible de charger les lignes .</p>
-            <p className="erreur-detail">{erreur}</p>
-            <p>Verifiez que le serveur Flask est lance (python api/app.py).</p>
-          </div>
-        </main>
-      </div>
-    );
-  }
+  if (erreur) return <div className="App"><Header /><main className="contenu"><p>{erreur}</p><button onClick={chargerDonnees}>Réessayer</button></main></div>;
 
   return (
     <div className="App">
       <Header />
       <main className="contenu">
-        <Recherche valeur={recherche} onChange={setRecherche} />
-
-        {/* --- AJOUT DU COMPTEUR ÉTAPE 9 --- */}
-        <p className="resultat-recherche">
-          {lignesFiltrees.length} ligne
-          {lignesFiltrees.length > 1 ? 's' : ''}
-          {' '} trouvee
-          {lignesFiltrees.length > 1 ? 's' : ''}
-        </p>
+        <div className="actions-bar">
+          <Recherche valeur={recherche} onChange={setRecherche} />
+          <button onClick={chargerDonnees} className="btn-recharger">Recharger</button>
+        </div>
 
         <div className="lignes-grid">
           {lignesFiltrees.map(ligne => (
@@ -100,6 +87,10 @@ function App() {
         </div>
 
         {ligneSelectionnee && <DetailLigne ligne={ligneSelectionnee} />}
+        
+        {/* Intégration correcte de la Carte [cite: 292] */}
+        <Carte /> 
+
       </main>
       <Footer />
     </div>

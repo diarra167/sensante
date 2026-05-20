@@ -1,8 +1,8 @@
 import './LigneBus.css';
 
-function LigneBus({ ligne, estSelectionnee, onClick }) {
-  const { numero, depart, arrivee, arrets } = ligne;
-
+// Ici, on récupère directement les propriétés envoyées par App.js
+function LigneBus({ numero, depart, arrivee, arrets, estSelectionnee, onClick }) {
+  
   return (
     <div
       className={`ligne-bus ${estSelectionnee ? 'ligne-bus-active' : ''}`}
