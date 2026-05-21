@@ -1,5 +1,6 @@
 # . gitignore - Fichiers a ne PAS versionner
 # Environnement Python
+.env
 __pycache__ /
 *. pyc
 venv /
